@@ -186,6 +186,8 @@
 
         .top-grid-cell.flagged {
             cursor: not-allowed;
+            /* スライダーの透明度を反映させるための設定 */
+            transition: opacity 0.1s ease;
         }
 
         /* コントロールエリア */
@@ -426,7 +428,7 @@
                 rows: 5,
                 wrongCells: [1, 5, 11, 14, 16, 17, 20, 22, 24, 25],
                 initialOpenCells: [6, 12, 13, 18, 23],
-                customLabels: [,"?", 0, 1, , 2, 2, "?", 2, "?",, 3, 2, , 2,,,4,4,,"?",,3,]
+                customLabels: [,, 0, 1, , 2, 2,, 2,,, 3, 2, , 2,,,4,4,,,,3,]
             },
             {
                 id: 2,
@@ -437,7 +439,7 @@
                 rows: 5,
                 wrongCells: [1, 5, 11, 14, 16, 17, 20, 22, 24, 25],
                 initialOpenCells: [6, 12, 13, 18, 23],
-                customLabels: [,"?", 0, 1, , 2, 2, "?", 2, "?",, 3, 2, , 2,,,4,4,,"?",,3,]
+                customLabels: [,, 0, 1, , 2, 2,, 2,,, 3, 2, , 2,,,4,4,,,,3,]
             },
             {
                 id: 3,
@@ -448,7 +450,7 @@
                 rows: 5,
                 wrongCells: [1, 5, 11, 14, 16, 17, 20, 22, 24, 25],
                 initialOpenCells: [6, 12, 13, 18, 23],
-                customLabels: [,"?", 0, 1, , 2, 2, "?", 2, "?",, 3, 2, , 2,,,4,4,,"?",,3,]
+                customLabels: [,, 0, 1, , 2, 2,, 2,,, 3, 2, , 2,,,4,4,,,,3,]
             },
             {
                 id: 4,
@@ -459,7 +461,7 @@
                 rows: 5,
                 wrongCells: [1, 5, 11, 14, 16, 17, 20, 22, 24, 25],
                 initialOpenCells: [6, 12, 13, 18, 23],
-                customLabels: [,"?", 0, 1, , 2, 2, "?", 2, "?",, 3, 2, , 2,,,4,4,,"?",,3,]
+                customLabels: [,, 0, 1, , 2, 2, , 2, ,, 3, 2, , 2,,,4,4,,,,3,]
             },
             {
                 id: 5,
@@ -470,7 +472,7 @@
                 rows: 5,
                 wrongCells: [1, 5, 11, 14, 16, 17, 20, 22, 24, 25],
                 initialOpenCells: [6, 12, 13, 18, 23],
-                customLabels: [,"?", 0, 1, , 2, 2, "?", 2, "?",, 3, 2, , 2,,,4,4,,"?",,3,]
+                customLabels: [,, 0, 1, , 2, 2,, 2,,, 3, 2, , 2,,,4,4,,,,3,]
             },
             {
                 id: 6,
@@ -562,6 +564,7 @@
                 stageStates[currentStageIndex][cellIndex] = 'flagged';
                 tCell.textContent = '🚩';
                 tCell.classList.add('flagged');
+                tCell.style.opacity = opacitySlider.value / 100;
                 triggerPenalty();
             }
         }
@@ -578,6 +581,7 @@
                 stageStates[currentStageIndex][cellIndex] = 'flagged';
                 tCell.textContent = '🚩';
                 tCell.classList.add('flagged');
+                tCell.style.opacity = opacitySlider.value / 100;
             }
         }
 
@@ -706,6 +710,7 @@
                 } else if (currentState === 'flagged') {
                     tCell.textContent = '🚩';
                     tCell.classList.add('flagged');
+                    tCell.style.opacity = opacitySlider.value / 100;
                 }
 
                 tCell.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -777,10 +782,20 @@
 
         opacitySlider.addEventListener('input', (e) => {
             const val = e.target.value;
-            bottomGrid.style.opacity = val / 100;
+            const opacityValue = val / 100;
+
+            // 1. 下層（白マス）の透明度を変更
+            bottomGrid.style.opacity = opacityValue;
+
+            // 2. 旗（flagged）が立っているマスの透明度も変更
+            const flaggedCells = document.querySelectorAll('.top-grid-cell.flagged');
+            flaggedCells.forEach(cell => {
+                cell.style.opacity = opacityValue;
+            });
+
             opacityDisplay.textContent = `${val}%`;
         });
-
+        
         // アプリ起動
         initStates();
         buildTabs();
