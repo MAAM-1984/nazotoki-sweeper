@@ -99,7 +99,7 @@
         .stage-wrapper {
             position: relative;
             width: 100%;
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 1.414 / 1;
             border-radius: 12px;
             overflow: hidden;
             background-color: #e5e7eb;
@@ -377,7 +377,7 @@
 
         <!-- タブと盤面の間のNGマス数表示 -->
         <div class="ng-count-panel" id="ngCountPanel">
-            ⚠️ NGマス数: <span id="ngCount">0</span> 個
+            ⚠️ 地雷の数: <span id="ngCount">0</span> 個
         </div>
 
         <!-- メイン表示領域 -->
@@ -487,7 +487,7 @@
             }
         ];
 
-        const LOCK_SECONDS = 5;      // NGマスを踏んだ時のペナルティ（秒）
+        const LOCK_SECONDS = 20;      // NGマスを踏んだ時のペナルティ（秒）
         const LONG_PRESS_MS = 500;   // タッチ長押し判定（ミリ秒）
 
         // ゲーム状態の管理
