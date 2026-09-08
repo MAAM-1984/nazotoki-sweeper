@@ -446,6 +446,13 @@
             margin-bottom: 6px;
         }
 
+        /* customLabels が '*' のマスの背景色を変更 */
+        .bottom-grid-cell.asterisk-cell {
+            background-color: #334155 !important; /* 薄い黄色 */
+            color: #d97706 !important;            /* 文字（アスタリスク）の色 */
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
@@ -571,13 +578,13 @@
             {
                 id: 6,
                 name: 'LAST',
-                image: 'LAST.jpeg',
+                image: '',
                 answer: 'かくしあじ',
                 cols: 5,
                 rows: 4,
                 wrongCells: [3, 5, 6, 10, 11, 13, 15],
                 initialOpenCells: [7, 8, 9, 12, 20],
-                customLabels: [,,,,,,4,2,5,,,3,,,,,,,,1]
+                customLabels: [,,'*',,'*','*',4,2,5,'*','*',3,'*',,'*',,,,,1]
             }
         ];
 
@@ -752,110 +759,149 @@
 
         // 盤面読み込み
         function loadStage(stageIndex) {
-            const stage = STAGES[stageIndex];
-            const savedAnswer = stageAnswers[stageIndex];
+        const stage = STAGES[stageIndex];
+        const savedAnswer = stageAnswers[stageIndex];
 
-            // NGマスの個数を更新
-            const wrongCount = stage.wrongCells ? stage.wrongCells.length : 0;
-            updateNgCountDisplay();
+        // NGマスの個数を更新
+        const wrongCount = stage.wrongCells ? stage.wrongCells.length : 0;
+        updateNgCountDisplay();
 
-            if (savedAnswer !== null) {
-                answerInput.value = savedAnswer;
-                answerInput.disabled = true;
-                submitAnswerBtn.disabled = true;
-                feedbackMessage.className = 'answer-feedback feedback-success';
-                feedbackMessage.textContent = '🎉 クリア済みです！';
-            } else {
-                answerInput.value = '';
-                answerInput.disabled = false;
-                submitAnswerBtn.disabled = false;
-                feedbackMessage.textContent = '';
-            }
-
-            bgImage.src = stage.image;
-
-            const cols = stage.cols;
-            const rows = stage.rows;
-
-            bottomGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            bottomGrid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-            topGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-            topGrid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-
-            bottomGrid.innerHTML = '';
-            topGrid.innerHTML = '';
-
-            const totalCells = cols * rows;
-
-            for (let i = 0; i < totalCells; i++) {
-                const cellIndex = i + 1;
-
-                const bCell = document.createElement('div');
-                bCell.className = 'bottom-grid-cell';
-                
-                const span = document.createElement('span');
-                const labels = stage.customLabels || [];
-                span.textContent = labels.length > i ? labels[i] : cellIndex;
-                bCell.appendChild(span);
-                bottomGrid.appendChild(bCell);
-
-                const tCell = document.createElement('div');
-                tCell.className = 'top-grid-cell';
-                
-                const isWrongCell = (stage.wrongCells || []).includes(cellIndex);
-                const currentState = stageStates[stageIndex][cellIndex];
-
-                if (currentState === 'hidden') {
-                    tCell.classList.add('hidden');
-                } else if (currentState === 'flagged') {
-                    tCell.textContent = '🚩';
-                    tCell.classList.add('flagged');
-                    tCell.style.opacity = opacitySlider.value / 100;
-                }
-
-                tCell.addEventListener('contextmenu', (e) => e.preventDefault());
-
-                tCell.addEventListener('mousedown', (e) => {
-                    if (e.pointerType === 'touch') return;
-
-                    if (e.button === 0) {
-                        handlePrimaryAction(tCell, cellIndex, isWrongCell);
-                    } else if (e.button === 2) {
-                        handleSecondaryAction(tCell, cellIndex, isWrongCell);
-                    }
-                });
-
-                let touchTimer = null;
-                let isLongPress = false;
-
-                tCell.addEventListener('touchstart', (e) => {
-                    if (isLocked) return;
-                    isLongPress = false;
-
-                    touchTimer = setTimeout(() => {
-                        isLongPress = true;
-                        if (navigator.vibrate) navigator.vibrate(50);
-                        handleSecondaryAction(tCell, cellIndex, isWrongCell);
-                    }, LONG_PRESS_MS);
-                }, { passive: true });
-
-                tCell.addEventListener('touchend', (e) => {
-                    clearTimeout(touchTimer);
-
-                    if (!isLongPress) {
-                        e.preventDefault();
-                        handlePrimaryAction(tCell, cellIndex, isWrongCell);
-                    }
-                });
-
-                tCell.addEventListener('touchmove', () => {
-                    clearTimeout(touchTimer);
-                }, { passive: true });
-
-                topGrid.appendChild(tCell);
-            }
+        if (savedAnswer !== null) {
+            answerInput.value = savedAnswer;
+            answerInput.disabled = true;
+            submitAnswerBtn.disabled = true;
+            feedbackMessage.className = 'answer-feedback feedback-success';
+            feedbackMessage.textContent = '🎉 クリア済みです！';
+        } else {
+            answerInput.value = '';
+            answerInput.disabled = false;
+            submitAnswerBtn.disabled = false;
+            feedbackMessage.textContent = '';
         }
 
+        // 最終ステージかどうか判定
+        const isLastStage = (stageIndex === STAGES.length - 1);
+
+        // 中間画像の処理（最終ステージなら中間画像を表示しない）
+        if (isLastStage) {
+            bgImage.style.display = 'none';
+        } else {
+            bgImage.style.display = 'block';
+            bgImage.src = stage.image;
+        }
+
+        const cols = stage.cols;
+        const rows = stage.rows;
+
+        bottomGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        bottomGrid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        topGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        topGrid.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+        bottomGrid.innerHTML = '';
+        topGrid.innerHTML = '';
+
+        const totalCells = cols * rows;
+
+        for (let i = 0; i < totalCells; i++) {
+            const cellIndex = i + 1;
+
+            // --- 下層（bottomGrid）の生成 ---
+            const bCell = document.createElement('div');
+            bCell.className = 'bottom-grid-cell';
+            
+            if (isLastStage && stage.image) {
+                // 最終ステージ：背景画像としてマスに切り分けて配置
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+
+                bCell.style.backgroundImage = `url('${stage.image}')`;
+                bCell.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
+                
+                const posX = cols > 1 ? (col / (cols - 1)) * 100 : 0;
+                const posY = rows > 1 ? (row / (rows - 1)) * 100 : 0;
+                bCell.style.backgroundPosition = `${posX}% ${posY}%`;
+            } else {
+                // 通常ステージ：テキスト（数字/ラベル）を表示
+                const span = document.createElement('span');
+                const labels = stage.customLabels || [];
+                const labelText = labels.length > i ? labels[i] : cellIndex;
+
+                if (labelText === '*') {
+                    bCell.classList.add('asterisk-cell');
+                    span.textContent = ''; // ← '*' の場合は文字を空にする
+                } else {
+                    span.textContent = labelText; // 通常のラベルや番号を表示
+                }
+
+                bCell.appendChild(span);
+            }
+            
+            bottomGrid.appendChild(bCell);
+
+            // --- 上層（topGrid）の生成 ---
+            const tCell = document.createElement('div');
+            tCell.className = 'top-grid-cell';
+            
+            const isWrongCell = (stage.wrongCells || []).includes(cellIndex);
+            const currentState = stageStates[stageIndex][cellIndex];
+
+            if (currentState === 'hidden') {
+                tCell.classList.add('hidden');
+            } else if (currentState === 'flagged') {
+                tCell.textContent = '🚩';
+                tCell.classList.add('flagged');
+                tCell.style.opacity = opacitySlider.value / 100;
+            }
+
+            tCell.addEventListener('contextmenu', (e) => e.preventDefault());
+
+            tCell.addEventListener('mousedown', (e) => {
+                if (e.pointerType === 'touch') return;
+
+                if (e.button === 0) {
+                    handlePrimaryAction(tCell, cellIndex, isWrongCell);
+                } else if (e.button === 2) {
+                    handleSecondaryAction(tCell, cellIndex, isWrongCell);
+                }
+            });
+
+            let touchTimer = null;
+            let isLongPress = false;
+
+            tCell.addEventListener('touchstart', (e) => {
+                if (isLocked) return;
+                isLongPress = false;
+
+                touchTimer = setTimeout(() => {
+                    isLongPress = true;
+                    if (navigator.vibrate) navigator.vibrate(50);
+                    handleSecondaryAction(tCell, cellIndex, isWrongCell);
+                }, LONG_PRESS_MS);
+            }, { passive: true });
+
+            tCell.addEventListener('touchend', (e) => {
+                clearTimeout(touchTimer);
+
+                if (!isLongPress) {
+                    e.preventDefault();
+                    handlePrimaryAction(tCell, cellIndex, isWrongCell);
+                }
+            });
+
+            tCell.addEventListener('touchmove', () => {
+                clearTimeout(touchTimer);
+            }, { passive: true });
+
+            topGrid.appendChild(tCell);
+        }
+
+        if (stageIndex === STAGES.length - 1) {
+            bottomGrid.style.opacity = 1;
+        } else {
+            bottomGrid.style.opacity = opacitySlider.value / 100;
+        }
+    }
         // イベントリスナー設定
         submitAnswerBtn.addEventListener('click', checkAnswer);
         
@@ -884,10 +930,18 @@
             const val = e.target.value;
             const opacityValue = val / 100;
 
-            // 1. 下層（白マス）の透明度を変更
-            bottomGrid.style.opacity = opacityValue;
+            // 最終ステージかどうか判定
+            const isLastStage = (currentStageIndex === STAGES.length - 1);
 
-            // 2. 旗（flagged）が立っているマスの透明度も変更
+            if (isLastStage) {
+                // 最終ステージ：画像が消えないよう下層の透明度は100%（不透明）に固定
+                bottomGrid.style.opacity = 1;
+            } else {
+                // 通常ステージ：下層（数字マス）の透明度を変更
+                bottomGrid.style.opacity = opacityValue;
+            }
+
+            // 旗（flagged）の透明度はステージ問わず変更
             const flaggedCells = document.querySelectorAll('.top-grid-cell.flagged');
             flaggedCells.forEach(cell => {
                 cell.style.opacity = opacityValue;
