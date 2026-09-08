@@ -896,12 +896,16 @@
             topGrid.appendChild(tCell);
         }
 
+        // --- タブ切り替え時にスライダーと透明度を80%にリセット ---
+        opacitySlider.value = 80;
+        opacityDisplay.textContent = '80%';
+
         if (stageIndex === STAGES.length - 1) {
-            bottomGrid.style.opacity = 1;
+            bottomGrid.style.opacity = 1; // 最終ステージは固定
         } else {
-            bottomGrid.style.opacity = opacitySlider.value / 100;
+            bottomGrid.style.opacity = 0.8; // 初期値80%（0.8）にセット
         }
-    }
+        }
         // イベントリスナー設定
         submitAnswerBtn.addEventListener('click', checkAnswer);
         
@@ -915,15 +919,23 @@
         window.addEventListener('keydown', (e) => {
             if (document.activeElement === answerInput) return;
 
-            if (e.key === 'ArrowLeft') {
-                if (currentStageIndex > 0) {
-                    switchStage(currentStageIndex - 1);
-                }
-            } else if (e.key === 'ArrowRight') {
-                if (currentStageIndex < unlockedStageMax) {
-                    switchStage(currentStageIndex + 1);
-                }
+            // 左右の矢印キーが押された場合
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        // スライダー等のデフォルトの挙動（透明度変更など）を完全に止める
+        e.preventDefault();
+
+        if (e.key === 'ArrowLeft') {
+            // 左キー：前のタブへ（1つ前のステージ）
+            if (currentStageIndex > 0) {
+                switchStage(currentStageIndex - 1);
             }
+        } else if (e.key === 'ArrowRight') {
+            // 右キー：次のタブへ（1つ次のステージ）
+            if (currentStageIndex < STAGES.length - 1) {
+                switchStage(currentStageIndex + 1);
+            }
+        }
+    }
         });
 
         opacitySlider.addEventListener('input', (e) => {
