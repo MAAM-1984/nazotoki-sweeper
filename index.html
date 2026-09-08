@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>謎解きスイーパー</title>
     <style>
+        /* 全要素のサイズ計算を標準化（はみ出し防止） */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* 解答入力エリアのレイアウト調整 */
+        .answer-container { /* ※実際の入力エリアを囲むクラス名に合致させてください */
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .answer-input { /* テキスト入力欄 */
+            flex: 1; /* 余った幅をいっぱい使う */
+            min-width: 0; /* スマホで縮小を許可してはみ出しを防ぐ */
+            width: 100%;
+        }
+
+        .submit-btn { /* 送信ボタン */
+            flex-shrink: 0; /* ボタンが潰れるのを防ぐ */
+            white-space: nowrap; /* 「送信」の文字折り返しを防ぐ */
+        }
         * {
             margin: 0;
             padding: 0;
@@ -41,29 +64,19 @@
 
         /* タブUI */
         .tab-container {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            display: flex;
             gap: 6px;
-            margin-bottom: 12px;
-            background: #f1f5f9;
-            padding: 6px;
-            border-radius: 10px;
+            overflow-x: auto; /* 幅を超えたら横スクロールできるようにする */
+            white-space: nowrap; /* タブ内での意図しない改行を防止 */
+            padding: 4px;
+            -webkit-overflow-scrolling: touch; /* スマホでのスクロールをなめらかに */
         }
 
         .tab-button {
-            padding: 10px 0;
+            flex-shrink: 0; /* スクロール時にタブが潰れないようにする */
+            white-space: nowrap; /* テキストの途中で改行させない */
+            padding: 6px 10px;
             font-size: 0.85rem;
-            font-weight: bold;
-            color: #64748b;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
         }
 
         .tab-button.active {
