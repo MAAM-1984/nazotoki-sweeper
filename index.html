@@ -377,7 +377,7 @@
 
         <!-- タブと盤面の間のNGマス数表示 -->
         <div class="ng-count-panel" id="ngCountPanel">
-            ⚠️ 地雷の数: <span id="ngCount">0</span> 個
+            ⚠️ 残りの地雷数／総地雷数：<span id="remainingNgCount">0</span>／ <span id="totalNgCount">0</span>
         </div>
 
         <!-- メイン表示領域 -->
@@ -390,7 +390,7 @@
         <!-- コントロール・解答入力領域 -->
         <div class="controls-wrapper">
             <div class="answer-panel">
-                <input type="text" id="answerInput" class="answer-input" placeholder="答えを入力してください" autocomplete="off">
+                <input type="text" id="answerInput" class="answer-input" placeholder="解答をひらがなで入力してください" autocomplete="off">
                 <button type="button" id="submitAnswerBtn" class="answer-button">送信</button>
             </div>
             <div class="answer-feedback" id="feedbackMessage"></div>
@@ -567,6 +567,9 @@
                 tCell.style.opacity = opacitySlider.value / 100;
                 triggerPenalty();
             }
+
+            updateNgCountDisplay();
+
         }
 
         // セルに「旗を立てる」処理
@@ -583,6 +586,9 @@
                 tCell.classList.add('flagged');
                 tCell.style.opacity = opacitySlider.value / 100;
             }
+
+            updateNgCountDisplay();
+
         }
 
         // 解答チェック機能
@@ -657,7 +663,7 @@
 
             // NGマスの個数を更新
             const wrongCount = stage.wrongCells ? stage.wrongCells.length : 0;
-            ngCount.textContent = wrongCount;
+            updateNgCountDisplay();
 
             if (savedAnswer !== null) {
                 answerInput.value = savedAnswer;
@@ -800,6 +806,32 @@
         initStates();
         buildTabs();
         loadStage(currentStageIndex);
+
+        // NGマスの残り数と総数を更新する関数
+        function updateNgCountDisplay() {
+            const stage = STAGES[currentStageIndex];
+            const wrongCells = stage.wrongCells || [];
+            const totalWrong = wrongCells.length;
+
+            // まだ見つけられていない（Normal状態の）NGマスの数をカウント
+            let remainingWrong = 0;
+            wrongCells.forEach(cellIndex => {
+                if (stageStates[currentStageIndex][cellIndex] === 'normal') {
+                    remainingWrong++;
+                }
+            });
+
+            // 画面のテキストを更新
+            const remainingEl = document.getElementById('remainingNgCount');
+            const totalEl = document.getElementById('totalNgCount');
+    
+            if (remainingEl && totalEl) {
+                remainingEl.textContent = remainingWrong;
+                totalEl.textContent = totalWrong;
+            }
+                
+        }
+
     </script>
 </body>
 </html>
