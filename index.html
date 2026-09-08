@@ -365,9 +365,103 @@
             color: #94a3b8;
             margin-top: 15px;
         }
+
+        /* スタート画面全体（画面全体を覆う幕） */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(240, 242, 245, 0.98);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        /* スタート画面が非表示のとき */
+        .start-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* モーダル枠 */
+        .start-modal {
+            background: #ffffff;
+            padding: 36px 32px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* スタートボタン */
+        .start-button {
+            padding: 16px 48px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #2563eb;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+
+        .start-button:hover {
+           background-color: #1d4ed8;
+         transform: translateY(-2px);
+        }
+
+        .start-button:active {
+            transform: translateY(0);
+        }
+
+        /* 注意書きスペース */
+        .start-notice {
+          background: #f8fafc;
+          border: 1px dashed #cbd5e1;
+          border-radius: 12px;
+          padding: 16px;
+           width: 100%;
+           font-size: 0.85rem;
+           color: #475569;
+            text-align: left;
+            line-height: 1.6;
+        }
+
+        .start-notice p:first-child {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- スタート画面（初期表示） -->
+        <div class="start-overlay" id="startOverlay">
+            <div class="start-modal">
+                <button type="button" class="start-button" id="startBtn">スタート</button>
+        
+                <!-- 注意書きエリア -->
+                <div class="start-notice">
+                    <p>【タイムアタックに挑戦される方】</p>
+                    <p>スタートを押すのと同時にタイマーをスタートしてください</p>
+                </div>
+            </div>
+        </div>
 
     <div class="container">
         <h1 id="stageTitle">謎解きスイーパー</h1>
@@ -831,6 +925,14 @@
             }
                 
         }
+
+        // スタートボタンの処理
+        const startOverlay = document.getElementById('startOverlay');
+        const startBtn = document.getElementById('startBtn');
+
+        startBtn.addEventListener('click', () => {
+            startOverlay.classList.add('hidden');
+        });
 
     </script>
 </body>
