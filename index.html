@@ -73,6 +73,9 @@
         }
 
         .tab-button {
+            background-color: #ffffff; /* 背景を白に */
+            color: #64748b;            /* 文字色（グレー） */
+            border: 1px solid #cbd5e1; /* 境目が分かりやすいように薄い枠線を追加 */
             flex-shrink: 0; /* スクロール時にタブが潰れないようにする */
             white-space: nowrap; /* テキストの途中で改行させない */
             padding: 6px 10px;
@@ -80,8 +83,10 @@
         }
 
         .tab-button.active {
-            background: #ffffff;
-            color: #2563eb;
+            background-color: #e2e8f0; /* 背景を灰色に */
+            color: #1e293b;            /* 文字色（濃いグレー / 黒） */
+            font-weight: bold;
+            border-color: #94a3b8;     /* 枠線も少し濃く */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         }
 
