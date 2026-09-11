@@ -943,7 +943,7 @@
                 let isLongPress = false;
                 let startX = 0;
                 let startY = 0;
-                const MOVE_THRESHOLD = 10; // 移動許容誤差（10ピクセル以内のブレは無視する）
+                const MOVE_THRESHOLD = 100; // 移動許容誤差（10ピクセル以内のブレは無視する）
 
                 tCell.addEventListener('touchstart', (e) => {
                     if (isLocked) return;
