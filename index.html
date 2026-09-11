@@ -471,6 +471,50 @@
             font-weight: bold;
         }
 
+        /* クリアモーダルの背景 */
+        .clear-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* モーダル表示時のアニメーション */
+        .clear-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .clear-modal-content {
+            text-align: center;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .clear-modal-content img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .clear-modal-text {
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -596,7 +640,7 @@
             {
                 id: 6,
                 name: 'LAST',
-                image: '',
+                clearImage: 'クリア画面.jpg',
                 answer: 'かくしあじ',
                 cols: 5,
                 rows: 4,
@@ -736,6 +780,17 @@
             } else {
                 feedbackMessage.className = 'answer-feedback feedback-error';
                 feedbackMessage.textContent = '❌ 不正解です。もう一度考えてみましょう！';
+            }
+
+            // 正解した時の処理内に以下を追加
+            const isLastStage = (currentStageIndex === STAGES.length - 1);
+
+            if (isLastStage) {
+                const currentStage = STAGES[currentStageIndex];
+                // clearImage があればそれを使い、無ければ通常の image を使う（保険）
+                const imageToShow = currentStage.clearImage || currentStage.image;
+                
+                showClearModal(imageToShow);
             }
         }
 
@@ -1018,6 +1073,24 @@
             startOverlay.classList.add('hidden');
         });
 
+        // クリアモーダルを表示する関数
+        function showClearModal(imageSrc) {
+            const modal = document.getElementById('clear-modal');
+            const modalImg = document.getElementById('clear-modal-img');
+            
+            if (modal && modalImg) {
+                modalImg.src = imageSrc;
+                modal.classList.add('show');
+            }
+        }
+
     </script>
+    <!-- クリア画像表示用モーダル -->
+    <div id="clear-modal" class="clear-modal">
+        <div class="clear-modal-content">
+            <img id="clear-modal-img" src="" alt="Clear Image">
+            <p class="clear-modal-text">タイマーを止めてください</p>
+        </div>
+    </div>
 </body>
 </html>
